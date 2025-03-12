@@ -6,3 +6,7 @@ my personal installer steps
 python3-lesscpy
 fontawesome-fonts-web（版本 >= 4.1.0）
 python3-pyxattr
+2、安装centos-release-openstack-antelope
+
+
+3、生成应答文件
