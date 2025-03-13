@@ -14,9 +14,7 @@ sudo systemctl stop NetworkManager
 sudo systemctl disable NetworkManager
 sudo systemctl enable network
 sudo systemctl start network
-
-
-
+主机ip地址等使用ip命令配置
 
 3、生成应答文件
 
