@@ -8,6 +8,11 @@ import re
 import platform
 import time
 
+from typing import Callable, TypeVar, Any, ParamSpec, Concatenate
+from functools import wraps
+
+T = TypeVar('T', bound='SSHConnectionManager')
+P = ParamSpec('P')
 from remote_deploy.utils.error_handler import retry, handle_ssh_errors
 
 class SSHConnectionManager:
@@ -43,9 +48,11 @@ class SSHConnectionManager:
             )
 
     # 新增连接验证装饰器
-    def connection_required(retries=3, delay=2):
-        def decorator(func):
-            def wrapper(self, *args, **kwargs):
+    @classmethod
+    def connection_required(cls, retries: int = 3, delay: int = 2) -> Callable[[Callable[[T, Any], Any]], Callable[[T, Any], Any]]:
+        def decorator(func: Callable[[T, Any], Any]) -> Callable[[T, Any], Any]:
+            @wraps(func)
+            def wrapper(self: T, *args, **kwargs) -> Any:
                 for attempt in range(retries):
                     try:
                         host = self.config['controller']['ip']
