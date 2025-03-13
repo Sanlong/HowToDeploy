@@ -1,9 +1,4 @@
 paramiko
 requests
 python-keystoneclient
-<<<<<<< HEAD
 python-novaclient
-=======
-python-novaclient
-parameterized
->>>>>>> 2697d128bdbe9f44caec22ce24734b00a5f748e9

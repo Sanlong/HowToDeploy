@@ -10,12 +10,9 @@
 ## 部署步骤
 ```bash
 # 安装基础依赖
-sudo dnf install -y https://rpmfind.net/linux/centos-stream/9-stream/CRB/x86_64/os/Packages/python3-lesscpy-0.14.0-7.el9.noarch.rpm   
+sudo dnf install -y https://rpmfind.net/linux/centos-stream/9-stream/CRB/x86_64/os/Packages/python3-lesscpy-0.14.0-7.el9.noarch.rpm
 sudo dnf install -y https://rpmfind.net/linux/centos-stream/9-stream/CRB/x86_64/os/Packages/fontawesome-fonts-web-4.7.0-13.el9.noarch.rpm
 sudo dnf install -y https://rpmfind.net/linux/centos-stream/9-stream/CRB/x86_64/os/Packages/python3-pyxattr-0.7.2-4.el9.x86_64.rpm
-# 软件包源：
-https://rpmfind.net
-
 
 # 安装OpenStack仓库
 sudo yum install -y centos-release-openstack-antelope
@@ -23,7 +20,7 @@ sudo yum install -y centos-release-openstack-antelope
 # 配置系统环境
 sudo setenforce 0
 sudo systemctl stop firewalld --now
-disable_network_manager
+sudo systemctl disable NetworkManager
 
 # 安装时间同步服务
 sudo yum install -y chrony
@@ -37,17 +34,6 @@ packstack --allinone
 1. 加载环境变量：
 ```bash
 source /root/keystonerc_admin
-```
-2. 验证部署：
-```bash
-openstack service list
-neutron agent-list
-```
-
-## 注意事项
-1. 部署完成后请立即修改默认密码
-2. 生产环境建议保持chrony时间同步服务运行
-3. 网络配置需通过nmcli或手动编辑ifcfg文件实现
 ```
 2. 验证部署：
 ```bash

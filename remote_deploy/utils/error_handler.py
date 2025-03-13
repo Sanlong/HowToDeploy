@@ -1,5 +1,6 @@
 import time
 import logging
+import paramiko
 from functools import wraps
 
 logger = logging.getLogger('error_handler')

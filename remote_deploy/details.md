@@ -32,25 +32,23 @@
    ```
 
 ## 部署流程
-
 ### 步骤1：仓库配置
 1. 版本自动发现
-   
-   ```bash
-   vName=$(dnf search centos-release-openstack-* | grep -Po 'centos-release-openstack-\K\w+' | sort -Vr | head -1)
-   [ -z "$vName" ] && { echo "未找到可用仓库版本"; exit 1; }
-   ```
-   
-   - 自动获取最新可用版本
-   - 包含错误处理机制
-2. 获得所有可用的版本列表并用序号排序，让用户通过序号选择安装哪个版本的仓库
 
-3. 安装仓库
-   
-   ```bash
-   sudo dnf install -y centos-release-openstack-$vName
-   ```
-   
+```bash
+vName=$(dnf search centos-release-openstack-* | grep -Po 'centos-release-openstack-\K\w+' | sort -Vr | head -1)
+[ -z "$vName" ] && { echo "未找到可用仓库版本"; exit 1; }
+```
+
+2. 版本选择
+   - 获取所有可用版本列表
+   - 按序号排序供用户选择
+
+3. 仓库安装
+
+```bash
+sudo dnf install -y centos-release-openstack-$vName
+```
    - 安装失败时自动终止并提示网络检查
 
 ### 步骤2：PackStack 安装
