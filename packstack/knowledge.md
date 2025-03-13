@@ -88,9 +88,16 @@ CONFIG_NEUTRON_L2_AGENT=openvswitch
 ---
 
 ### 6. **注意事项**
-- **网络接口名称**：确保 `CONFIG_NEUTRON_OVS_BRIDGE_IFACES` 中的接口名称（如 `eth0`）与你的实际接口名称一致。
+- **网络接口名称**：确保 `CONFIG_NEUTRON_OVS_BRIDGE_IFACES` 中的接口名称（如 `eth0`）与你的实际接口名称一致，可通过 `ip addr` 命令查询。
 - **物理网络映射**：`CONFIG_NEUTRON_OVS_BRIDGE_MAPPINGS` 中的 `physnet1` 需要与你的网络拓扑匹配。
-- **VPNaaS 依赖**：VPNaaS 需要额外的插件（如 `openswan` 或 `strongswan`），确保这些插件已安装并配置。
+- **VPNaaS 依赖**：VPNaaS 需要安装额外插件（如 `openswan` 或 `strongswan`），建议在部署前执行：
+  ```bash
+  sudo yum install -y openstack-neutron-vpnaas strongswan
+  ```
+- **SELinux 模式**：生产环境建议保持 enforcing 模式，可通过以下命令添加策略：
+  ```bash
+  sudo setsebool -P neutron_can_network=1
+  ```
 
 ---
 

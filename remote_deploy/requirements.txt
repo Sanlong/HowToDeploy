@@ -1,0 +1,5 @@
+paramiko
+requests
+python-keystoneclient
+python-novaclient
+parameterized
