@@ -1,0 +1,23 @@
+{
+  "controller_ip": "192.168.1.100",
+  "ssh_config": {
+    "username": "admin",
+    "auth_type": "password",
+    "password": "mysecret"
+  },
+  "target_nodes": [
+    {"ip": "192.168.1.101", "role": "compute"},
+    {"ip": "192.168.1.102", "role": "network"}
+  ],
+  "network_interface": "eth0",
+  "packstack_answer_file": "/root/answer.txt",
+  "admin_password": "secure_admin_pwd"
+}
+{
+  "target_ip": "192.168.1.100",
+  "username": "admin",
+  "password": "your_password",
+  "ssh_port": 22,
+  "architecture": "x86_64",
+  "os_version": "Rocky Linux 9.5"
+}

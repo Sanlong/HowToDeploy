@@ -1,0 +1,6 @@
+{
+    "target_ip": "192.168.1.100",
+    "admin_password": "test_password",
+    "compute_nodes": "192.168.1.101,192.168.1.102",
+    "packstack_answer_file": "/tmp/packstack_answer_test"
+}
