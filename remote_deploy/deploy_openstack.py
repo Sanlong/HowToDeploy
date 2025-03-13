@@ -8,6 +8,8 @@ import re
 import platform
 import time
 
+from remote_deploy.utils.error_handler import retry, handle_ssh_errors
+
 class SSHConnectionManager:
     def __init__(self, config):
         self.connections = {}
@@ -18,20 +20,13 @@ class SSHConnectionManager:
         if 'controller' not in config or 'nodes' not in config:
             raise ValueError("配置缺少controller或nodes节点")
 
-    def _establish_connection(self, host, credentials, retries=3):
-        for attempt in range(retries):
-            try:
-                client = paramiko.SSHClient()
-                client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                client.connect(host, **credentials)
-                self.connections[host] = client
-                self.logger.info(f'成功建立{host}连接')
-                return
-            except Exception as e:
-                self.logger.warning(f'{host}连接失败（尝试 {attempt+1}/{retries}）: {str(e)}')
-                if attempt == retries - 1:
-                    raise
-                time.sleep(2)
+    @handle_ssh_errors
+    @retry(max_retries=3)
+    def _establish_connection(self, host, credentials):
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(host, **credentials)
+        self.connections[host] = client
 
     def connect_all(self):
         # 使用统一的连接方法建立主控机连接
@@ -47,33 +42,39 @@ class SSHConnectionManager:
                 credentials=node.get('credentials', self.config['node_defaults'])
             )
 
-    def _execute_remote_command(self, command: str, retries: int = 3) -> str:
-        client = self.connections.get(self.config['controller']['ip'])
-        if not client:
-            raise ConnectionError(f'控制器连接丢失: {self.config["controller"]["ip"]}')
-        for attempt in range(retries):
-            try:
-                _, stdout, stderr = client.exec_command(command)
-                exit_code = stdout.channel.recv_exit_status()
-                output = stdout.read().decode().strip()
-                error = stderr.read().decode().strip()
+    # 新增连接验证装饰器
+    def connection_required(retries=3, delay=2):
+        def decorator(func):
+            def wrapper(self, *args, **kwargs):
+                for attempt in range(retries):
+                    try:
+                        host = self.config['controller']['ip']
+                        if not self.connections.get(host):
+                            self._establish_connection(host, self.config['controller']['credentials'])
+                        return func(self, *args, **kwargs)
+                    except Exception as e:
+                        self.logger.warning(f'连接验证失败（尝试 {attempt+1}/{retries}）: {str(e)}')
+                        if attempt == retries - 1:
+                            raise
+                        time.sleep(delay)
+                return func(self, *args, **kwargs)
+            return wrapper
+        return decorator
 
-                if exit_code != 0:
-                    self.logger.error(f'命令执行失败（尝试 {attempt+1}/{retries}）: {command}\n错误: {error}')
-                    return f'Command failed with exit code {exit_code}: {error}'
+    @handle_ssh_errors
+    @retry()
+    def _execute_remote_command(self, command: str) -> str:
+        client = self.connections[self.config['controller']['ip']]
+        _, stdout, stderr = client.exec_command(command)
+        exit_code = stdout.channel.recv_exit_status()
+        output = stdout.read().decode().strip()
+        error = stderr.read().decode().strip()
 
-                self.logger.debug(f'成功执行命令: {command}\n输出: {output}')
-                return output
-            except Exception as e:
-                self.logger.warning(f'命令执行异常（尝试 {attempt+1}/{retries}）: {str(e)}')
-                if attempt == retries - 1:
-                    raise
-                self._establish_connection(
-                    host=self.config['controller']['ip'],
-                    credentials=self.config['controller']['credentials']
-                )
-                time.sleep(2)
-        return 'All retries exhausted, command execution failed'
+        if exit_code != 0:
+            raise RuntimeError(f'命令执行失败: {command}\n错误: {error}')
+        
+        self.logger.debug(f'成功执行命令: {command}\n输出: {output}')
+        return output
 
     def generate_answer_file(self, conn):
         # 生成带时间戳的应答文件名
@@ -92,8 +93,8 @@ class SSHConnectionManager:
         target_ips = [node['ip'] for node in self.config['target_nodes']]
         
         modify_cmds = [
-            f"sed -i 's/CONFIG_COMPUTE_HOSTS=.*/CONFIG_COMPUTE_HOSTS={','.join(target_ips)}/' {output_path}",
-            f"sed -i 's/CONFIG_NEUTRON_OVS_BRIDGE_IFACES=.*/CONFIG_NEUTRON_OVS_BRIDGE_IFACES={self.config['network_interface']}/' {output_path}"
+            f"sed -i -e 's/CONFIG_COMPUTE_HOSTS=.*/CONFIG_COMPUTE_HOSTS={','.join(target_ips)}/' "
+            f"-e 's/CONFIG_NEUTRON_OVS_BRIDGE_IFACES=.*/CONFIG_NEUTRON_OVS_BRIDGE_IFACES={self.config['network_interface']}/' {output_path}"
         ]
         
         for cmd in modify_cmds:

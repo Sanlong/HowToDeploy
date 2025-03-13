@@ -48,3 +48,14 @@ neutron agent-list
 1. 部署完成后请立即修改默认密码
 2. 生产环境建议保持chrony时间同步服务运行
 3. 网络配置需通过nmcli或手动编辑ifcfg文件实现
+```
+2. 验证部署：
+```bash
+openstack service list
+neutron agent-list
+```
+
+## 注意事项
+1. 部署完成后请立即修改默认密码
+2. 生产环境建议保持chrony时间同步服务运行
+3. 网络配置需通过nmcli或手动编辑ifcfg文件实现

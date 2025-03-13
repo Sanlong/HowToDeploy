@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "controller_ip": "192.168.1.100",
   "ssh_config": {
     "username": "admin",
@@ -14,6 +15,8 @@
   "admin_password": "secure_admin_pwd"
 }
 {
+=======
+>>>>>>> 2697d128bdbe9f44caec22ce24734b00a5f748e9
   "target_ip": "192.168.1.100",
   "username": "admin",
   "password": "your_password",
