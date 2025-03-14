@@ -14,6 +14,9 @@ check_os_environment() {
     dnf install -y epel-release
     dnf config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
     sed -i 's#download.docker.com#mirrors.aliyun.com/docker-ce#g' /etc/yum.repos.d/docker-ce.repo
+    # 添加镜像加速器
+    mkdir -p /etc/docker
+    echo '{"registry-mirrors": ["https://你的阿里云镜像加速地址.mirror.aliyuncs.com"]}' > /etc/docker/daemon.json
 
     # 验证软件包名称
     required_packages=(
@@ -95,7 +98,7 @@ install_dependencies() {
 setup_container_env() {
     systemctl start docker
     systemctl enable docker
-    pip3 install docker-compose
+    pip3 install docker-compose -i https://pypi.tuna.tsinghua.edu.cn/simple --trusted-host pypi.tuna.tsinghua.edu.cn
 }
 
 # 配置SELinux

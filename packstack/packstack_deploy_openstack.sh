@@ -1,9 +1,45 @@
 #!/bin/bash
-# OpenStack自动化部署脚本 | OpenStack Auto Deployment Script
+# OpenStack自动化部署管理脚本 | OpenStack Deployment Management Script
 
-# 记录初始软件包状态
-echo "正在记录系统当前软件包状态... | Recording current package status..."
-rpm -qa | sort > installed_packages_before.log
+# 主菜单函数
+show_menu() {
+    clear
+    echo "================ OpenStack 部署管理系统 ================"
+    echo "1) 完整部署OpenStack环境"
+    echo "2) 回退到初始状态"
+    echo "3) 退出系统"
+    echo "======================================================="
+}
+
+# 公共函数：sudo权限验证
+check_sudo() {
+    if ! sudo -v; then
+        echo "错误：当前用户无sudo权限 | Error: User has no sudo privileges"
+        exit 1
+    fi
+}
+
+# 公共函数：记录软件包状态
+record_packages() {
+    echo "正在记录软件包状态... | Recording package status..."
+    rpm -qa | sort > installed_packages_$1.log
+}
+
+# 主程序入口
+while true; do
+    show_menu
+    read -p "请输入选项编号（1-3）| Enter option number: " choice
+
+    case $choice in
+        1)
+            # 部署模式子菜单
+            echo "\n请选择部署模式 | Select deployment mode:"
+            echo "1) All-in-one 模式（快速部署单节点）"
+            echo "2) 应答文件模式（自定义配置）"
+            read -p "请输入部署模式编号（1/2）| Enter mode number: " deploy_mode
+
+            check_sudo
+            record_packages "before"
 
 # 检查sudo权限
 if ! sudo -v; then
@@ -138,6 +174,39 @@ fi
 echo "正在生成新增软件包列表... | Generating new package list..."
 rpm -qa | sort > installed_packages_after.log
 comm -13 installed_packages_before.log installed_packages_after.log > added_packages.log
+
+            echo "\nOpenStack部署完成！| Deployment completed!"
+            ;;
+        
+        2)
+            # 执行环境清理
+            check_sudo
+            
+            if [ ! -f "added_packages.log" ]; then
+                echo "错误：找不到新增软件包列表，请先完成部署 | Error: Missing package list, deploy first"
+                exit 1
+            fi
+
+            echo "正在回退系统状态... | Rolling back system..."
+            sudo xargs -t -a added_packages.log rpm -e --nodeps
+            sudo dnf remove -y centos-release-openstack-dalmatian
+            sudo rm -rf /etc/yum.repos.d/packstack*
+            
+            echo "系统已成功回退到初始状态！| Rollback completed!"
+            ;;
+        
+        3)
+            echo "退出系统 | Exiting..."
+            exit 0
+            ;;
+        
+        *)
+            echo "无效选项，请重新输入 | Invalid option, try again"
+            sleep 1
+            ;;
+    esac
+
+done
 
 # 显示完成信息 | Show completion message
 echo "OpenStack部署成功！| OpenStack deployment successful!"
