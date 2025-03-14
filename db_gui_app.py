@@ -97,7 +97,6 @@ class DBAccessApp:
                 encrypted = f.read()
             cipher_suite = Fernet(self._load_or_create_key())
             decrypted = cipher_suite.decrypt(encrypted).decode('utf-8')
-            # 删除此处的import语句
             return json.loads(decrypted)
         except (FileNotFoundError, json.JSONDecodeError, ValueError) as e:
             print(f'解密配置失败: {str(e)}')

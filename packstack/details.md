@@ -1,15 +1,15 @@
-## 角色定义
+## 角色定义 | Role Definition
 
 ### 执行机 (Controller Machine)
-- 运行部署脚本的机器
-- 支持 Linux/Windows 系统（Windows 无需 WSL 环境）
+- 运行部署脚本的机器 | Machine running deployment scripts
+- 支持 Linux/Windows 系统（Windows 无需 WSL 环境） | Supports Linux/Windows systems (No WSL required for Windows)
 
 ### 主控机 (Master Node)
-- 运行 PackStack 的机器
-- 负责生成应答文件并执行部署
+- 运行 PackStack 的机器 | Machine running PackStack
+- 负责生成应答文件并执行部署 | Responsible for generating answer files and executing deployment
 
 ### 目标机 (Target Node)
-- 实际部署 OpenStack 的机器
+- 实际部署 OpenStack 的机器 | Physical machine deploying OpenStack
 
 ## 环境检查要求
 
@@ -32,6 +32,12 @@
    ```
 
 ## 部署流程
+### 阶段一：环境准备
+1. sudo权限验证
+```bash
+sudo -v || { echo "需要管理员权限"; exit 1; }  # 验证sudo权限
+```
+2. 主控机网络检测
 ### 步骤1：仓库配置
 1. 版本自动发现
 
@@ -58,14 +64,15 @@ sudo dnf install -y openstack-packstack  # 安装 PackStack
 
 ### 步骤3：应答文件生成
 ```bash
-packstack --gen-answer-file=answer.txt  # 生成应答模板
+envsubst < packstack_answer_template.j2 > answer.txt  # 使用环境变量渲染模板
 ```
 
 ### 步骤4：应答文件配置
 ```ini
 # Neutron 网络配置 (Neutron Network Configuration)
-CONFIG_NEUTRON_ML2_MECHANISM_DRIVERS=openvswitch  # 指定Mechanism Driver（默认使用openvswitch）
-CONFIG_NEUTRON_L2_AGENT=openvswitch      # 设置L2代理（支持openvswitch/linuxbridge）
+CONFIG_NEUTRON_OVS_BRIDGE_IFACES={{ network_interface }}  # 指定网络接口
+CONFIG_NEUTRON_ML2_MECHANISM_DRIVERS=openvswitch
+CONFIG_NEUTRON_L2_AGENT=openvswitch
 CONFIG_NEUTRON_VPNAAS=y                 # 启用VPN即服务功能 (Enable VPN-as-a-Service)
 
 # 节点配置 (Node Configuration)
@@ -75,7 +82,7 @@ CONFIG_COMPUTE_HOSTS=<目标机IP>  # 指定计算节点IP（多个IP用逗号�
 
 ### 步骤5：部署执行
 ```bash
-packstack --answer-file=answer.txt  # 开始部署
+packstack --answer-file=answer.txt | tee deployment.log  # 同时输出到控制台和日志文件
 ```
 
 ### 步骤6：结果验证

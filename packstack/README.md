@@ -1,11 +1,15 @@
-# PackStack OpenStack 一键部署指南
+# PackStack OpenStack 一键部署指南 | PackStack OpenStack One-Click Deployment Guide
 
-## 安装要求
-1. 系统要求：CentOS Stream 9
-2. 需要提前下载的依赖包：
-   - python3-lesscpy
-   - fontawesome-fonts-web (版本 >= 4.1.0)
-   - python3-pyxattr
+## 安装要求 | Installation Requirements
+1. 系统要求：CentOS Stream 9 | System Requirements: CentOS Stream 9
+2. 需要提前下载的依赖包 | Required dependencies:
+   - python3-lesscpy (Python LESS compiler)
+   - fontawesome-fonts-web (版本 >= 4.1.0 | Version >= 4.1.0)
+   - python3-pyxattr (Extended attributes support)
+
+## 多语言支持 | Multilingual Support
+本项目所有技术文档和脚本注释均采用中英双语格式 | All technical documentation and script comments in this project are bilingual (Chinese-English).
+使用竖线分隔双语内容 | Uses vertical bar separator for bilingual content.
 
 ## 部署步骤
 ```bash
