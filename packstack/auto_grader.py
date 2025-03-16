@@ -2,26 +2,26 @@ import subprocess
 import re
 import sys
 from typing import Dict, List
+import logging
+import yaml
+import os
 
 def parse_markdown(file_path: str) -> Dict[str, List[str]]:
     """解析RHCE实验文档中的代码块和考核要求"""
-    sections = {}
-    current_section = ''
-    
-    with open(file_path, 'r', encoding='utf-8') as f:
-        for line in f:
-            if line.startswith('## '):
-                current_section = line.strip().split(' ', 2)[-1]
-                sections[current_section] = []
-            elif line.startswith('```'):
-                code_block = []
-                while True:
-                    line = next(f)
-                    if line.startswith('```'):
-                        break
-                    code_block.append(line)
-                sections[current_section].append(''.join(code_block))
-    return sections
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        # 提取代码块
+        code_blocks = re.findall(r'```(.+?)```', content, re.DOTALL)
+        # 提取要求
+        requirements = re.findall(r'## 要求\n(.+?)\n##', content, re.DOTALL)
+        return {
+            'code_blocks': code_blocks,
+            'requirements': requirements
+        }
+    except Exception as e:
+        print(f"解析文档失败: {e}")
+        return {'code_blocks': [], 'requirements': []}
 
 def check_firewall_rules() -> bool:
     """验证防火墙服务配置"""
@@ -75,38 +75,64 @@ def check_user_permissions(users: List[str]) -> bool:
         print(f"用户权限检查失败: {e}")
         return False
 
+class ConfigManager:
+    def __init__(self, config_path: str = "config.yml"):
+        self.config_path = config_path
+        self.config = self._load_config()
+
+    def _load_config(self) -> dict:
+        if not os.path.exists(self.config_path):
+            default_config = {
+                "check_items": {
+                    "firewall": True,
+                    "ansible": True,
+                    "container": True,
+                    "users": True
+                },
+                "container_name": "test-container",
+                "required_users": ["user1", "user2"]
+            }
+            with open(self.config_path, 'w') as f:
+                yaml.dump(default_config, f)
+            return default_config
+        with open(self.config_path) as f:
+            return yaml.safe_load(f)
+
 def main():
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler('grader.log'),
+            logging.StreamHandler()
+        ]
+    )
+
     if len(sys.argv) < 2:
-        print("Usage: python auto_grader.py <markdown_file>")
+        logging.error("请提供markdown文件路径")
         sys.exit(1)
     
-    lab_sections = parse_markdown(sys.argv[1])
+    file_path = sys.argv[1]
+    results = parse_markdown(file_path)
     
-    # 系统初始化配置验证
-    if '系统初始化配置' in lab_sections:
-        required_users = [f'ops0{i}' for i in range(1,6)]
-        user_check = check_user_permissions(required_users)
-        firewall_check = check_firewall_rules()
-        
-        print(f"用户权限验证结果: {'通过' if user_check else '失败'}")
-        print(f"防火墙配置验证结果: {'通过' if firewall_check else '失败'}")
-        
-        # 初始化计分系统
-        total_score = 0
-        scoring_rules = {
-            '用户权限': {'weight': 0.4, 'passed': user_check},
-            '防火墙配置': {'weight': 0.3, 'passed': firewall_check},
-            'Ansible部署': {'weight': 0.2, 'passed': verify_ansible_deployment()},
-            '容器状态': {'weight': 0.1, 'passed': check_container_status('httpd')}
-        }
-        
-        # 计算总分并生成报告
-        total_score = sum(rule['weight'] * 100 for rule in scoring_rules.values() if rule['passed'])
-        print(f"\n{'='*30} 考核报告 {'='*30}")
-        for category, data in scoring_rules.items():
-            status = '✓' if data['passed'] else '✗'
-            print(f"{category.ljust(10)} | 权重:{data['weight']} | 状态: {status}")
-        print(f"{'='*70}\n最终得分: {total_score:.1f}/100")
+    config = ConfigManager()
+    check_items = []
+    
+    if config.config['check_items']['firewall']:
+        check_items.append(check_firewall_rules())
+    if config.config['check_items']['ansible']:
+        check_items.append(verify_ansible_deployment())
+    if config.config['check_items']['container']:
+        check_items.append(check_container_status(config.config['container_name']))
+    if config.config['check_items']['users']:
+        check_items.append(check_user_permissions(config.config['required_users']))
+    
+    if all(check_items):
+        logging.info("所有检查项通过")
+        sys.exit(0)
+    else:
+        logging.warning("存在未通过的检查项")
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()

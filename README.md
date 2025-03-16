@@ -1,5 +1,35 @@
 # HowToDeploy
 
+自动化部署工具集合
+
+## 项目结构
+
+```
+HowToDeploy/
+├── packstack/          # OpenStack部署工具
+│   ├── auto_grader.py # 自动评分工具
+│   └── details.md     # 部署说明文档
+├── awx_depoly/        # AWX部署工具
+│   └── remote_runner.py # 远程部署脚本
+└── README.md          # 项目说明文档
+```
+
+## 使用说明
+
+1. OpenStack部署
+   - 参考 `packstack/details.md`
+   - 使用 `auto_grader.py` 验证部署
+
+2. AWX部署
+   - 运行 `remote_runner.py` 进行远程部署
+   - 支持断点续传和自动重试
+
+## 开发指南
+
+详见各子目录下的说明文档。
+
+# HowToDeploy
+
 ## 项目概述
 自动化部署工具集合，包含多种基础设施的一键部署方案
 
