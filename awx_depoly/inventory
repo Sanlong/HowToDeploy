@@ -1,0 +1,14 @@
+[all]
+localhost ansible_connection=local
+
+[all:vars]
+postgres_data_dir=/var/lib/pgsql/13/data
+docker_registry_username=""
+docker_registry_password=""
+admin_password=password
+pg_password=password
+broadcast_websocket_secret=password
+secret_key=mysupersecret
+
+[awx_nodes]
+localhost
