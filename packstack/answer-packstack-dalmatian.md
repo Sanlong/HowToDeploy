@@ -1,17 +1,17 @@
 [general]
 
-# Path to a public key to install on servers. If a usable key has not
-# been installed on the remote servers, the user is prompted for a
-# password and this key is installed so the password will not be
+# SSH公钥路径 | Path to a public key to install on servers. If a usable key has not
+# been installed on the remote servers, the user is prompted for a 
+# password and this key is installed so the password will not be 
 # required again.
 CONFIG_SSH_KEY=/home/msl/.ssh/id_rsa.pub
 
-# Default password to be used everywhere (overridden by passwords set
+# 全局默认密码 | Default password to be used everywhere (overridden by passwords set
 # for individual services or users).
 CONFIG_DEFAULT_PASSWORD=
 
-# The amount of service workers/threads to use for each service.
-# Useful to tweak when you have memory constraints. Defaults to the
+# 服务进程/线程数量 | The amount of service workers/threads to use for each service.
+# 当内存受限时可调整此值，默认使用系统CPU核心数 | Useful to tweak when you have memory constraints. Defaults to the
 # amount of cores on the system.
 CONFIG_SERVICE_WORKERS=%{::processorcount}
 
@@ -27,7 +27,7 @@ CONFIG_SERVICE_WORKERS=%{::processorcount}
 # NTP服务器列表 | Comma-separated list of NTP servers. Leave plain if Packstack should not configure NTP
 CONFIG_NTP_SERVERS=
 
-# 指定控制器节点IP | Server IP for installing OpenStack controller services
+# 控制节点IP地址 | Server IP for installing OpenStack controller services
 CONFIG_CONTROLLER_HOST=192.168.0.101
 
 # Specify 'y' to install OpenStack Image Service (glance). ['y', 'n']
@@ -270,7 +270,7 @@ CONFIG_SSL_CERT_SUBJECT_MAIL=admin@zabbix
 # ['rabbitmq']
 CONFIG_AMQP_BACKEND=rabbitmq
 
-# IP address of the server on which to install the AMQP service.
+# 消息队列服务器IP | IP address of the server on which to install the AMQP service.
 CONFIG_AMQP_HOST=192.168.0.101
 
 # Specify 'y' to enable SSL for the AMQP service. ['y', 'n']
@@ -286,7 +286,7 @@ CONFIG_AMQP_AUTH_USER=amqp_user
 # Password for AMQP authentication.
 CONFIG_AMQP_AUTH_PASSWORD=PW_PLACEHOLDER
 
-# IP address of the server on which to install MariaDB. If a MariaDB
+# 数据库服务器IP | IP address of the server on which to install MariaDB. If a MariaDB
 # installation was not specified in CONFIG_MARIADB_INSTALL, specify
 # the IP address of an existing database server (a MariaDB cluster can
 # also be specified).
@@ -295,10 +295,10 @@ CONFIG_MARIADB_HOST=192.168.0.101
 # User name for the MariaDB administrative user.
 CONFIG_MARIADB_USER=root
 
-# Password for the MariaDB administrative user.
+# 数据库管理员密码 | Password for the MariaDB administrative user.
 CONFIG_MARIADB_PW=cb7093b35a0d41e2
 
-# Password to use for the Identity service (keystone) to access the
+# Keystone数据库密码 | Password to use for the Identity service (keystone) to access the
 # database.
 CONFIG_KEYSTONE_DB_PW=cf373625fe684e1e
 
@@ -316,10 +316,10 @@ CONFIG_KEYSTONE_ADMIN_EMAIL=root@localhost
 # 'admin'.
 CONFIG_KEYSTONE_ADMIN_USERNAME=admin
 
-# Password to use for the Identity service 'admin' user.
+# Keystone管理员密码 | Password to use for the Identity service 'admin' user.
 CONFIG_KEYSTONE_ADMIN_PW=6a94b80475404777
 
-# Password to use for the Identity service 'demo' user.
+# Keystone演示用户密码 | Password to use for the Identity service 'demo' user.
 CONFIG_KEYSTONE_DEMO_PW=c58603edff05472c
 
 # Identity service API version string. ['v3']
@@ -332,7 +332,7 @@ CONFIG_KEYSTONE_TOKEN_FORMAT=FERNET
 # Type of Identity service backend (sql or ldap). ['sql', 'ldap']
 CONFIG_KEYSTONE_IDENTITY_BACKEND=sql
 
-# URL for the Identity service LDAP backend.
+# LDAP服务器URL | URL for the Identity service LDAP backend.
 CONFIG_KEYSTONE_LDAP_URL=ldap://192.168.0.101
 
 # User DN for the Identity service LDAP backend.  Used to bind to the
@@ -470,11 +470,11 @@ CONFIG_KEYSTONE_LDAP_TLS_CACERTFILE=
 # 'demand']
 CONFIG_KEYSTONE_LDAP_TLS_REQ_CERT=demand
 
-# Password to use for the Image service (glance) to access the
+# Glance数据库密码 | Password to use for the Image service (glance) to access the
 # database.
 CONFIG_GLANCE_DB_PW=f0672f6c19864c2c
 
-# Password to use for the Image service to authenticate with the
+# Glance认证密码 | Password to use for the Image service to authenticate with the
 # Identity service.
 CONFIG_GLANCE_KS_PW=951a661acd5b4f41
 
@@ -1146,12 +1146,10 @@ CONFIG_PROVISION_DEMO_FLOATRANGE=172.24.4.0/24
 # Allocation pools in the floating IP subnet.
 CONFIG_PROVISION_DEMO_ALLOCATION_POOLS=[]
 
-# The name to be assigned to the demo image in Glance (default
-# "cirros").
+# 测试映像名称 | The name to be assigned to the demo image in Glance.
 CONFIG_PROVISION_IMAGE_NAME=cirros
 
-# A URL or local file location for an image to download and provision
-# in Glance (defaults to a URL for a recent "cirros" image).
+# 测试映像URL | A URL or local file location for an image to download and provision in Glance.
 CONFIG_PROVISION_IMAGE_URL=https://download.cirros-cloud.net/0.5.1/cirros-0.5.1-x86_64-disk.img
 
 # Format for the demo image (default "qcow2").
@@ -1203,16 +1201,16 @@ CONFIG_PROVISION_TEMPEST_FLAVOR_ALT_VCPUS=1
 # Specify 'y' to run Tempest smoke test as last step of installation.
 CONFIG_RUN_TEMPEST=n
 
-# Test suites to run, example: "smoke dashboard TelemetryAlarming".
-# Optional, defaults to "smoke".
+# 包含的测试套件 | Test suites to run, example: "smoke dashboard TelemetryAlarming".
+# 可选，默认为"smoke" | Optional, defaults to "smoke".
 CONFIG_RUN_TEMPEST_TESTS=smoke
 
-# Tests to skip, example: "test_basic_scenario test_volume".
-# Optional, defaults to "".
+# 要跳过的测试 | Tests to skip, example: "test_basic_scenario test_volume".
+# 可选，默认为空 | Optional, defaults to "".
 CONFIG_SKIP_TEMPEST_TESTS=
 
-# Specify 'y' to configure the Open vSwitch external bridge for an
-# all-in-one deployment (the L3 external bridge acts as the gateway
+# 是否配置OVS外部网桥 | Specify 'y' to configure the Open vSwitch external bridge for an
+# 用于一体化部署时的L3外部网桥作为虚拟机网关 | all-in-one deployment (the L3 external bridge acts as the gateway
 # for virtual machines). ['y', 'n']
 CONFIG_PROVISION_OVS_BRIDGE=y
 
@@ -1240,10 +1238,10 @@ CONFIG_CEILOMETER_COORDINATION_BACKEND=redis
 # this should be false to avoid unnecessary load.
 CONFIG_ENABLE_CEILOMETER_MIDDLEWARE=n
 
-# IP address of the server on which to install the Redis server.
+# Redis服务器IP | IP address of the server on which to install the Redis server.
 CONFIG_REDIS_HOST=192.168.0.101
 
-# Port on which the Redis server listens.
+# Redis服务端口 | Port on which the Redis server listens.
 CONFIG_REDIS_PORT=6379
 
 # Password to use for Telemetry Alarming to authenticate with the
