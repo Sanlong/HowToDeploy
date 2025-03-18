@@ -8,5 +8,10 @@
         "*test.py"
     ],
     "python.testing.pytestEnabled": false,
-    "python.testing.unittestEnabled": true
+    "python.testing.unittestEnabled": true,
+    "python-envs.defaultEnvManager": "ms-python.python:venv",
+    "python-envs.pythonProjects": [],
+    "yaml.schemas": {
+        "file:///c%3A/Users/maosanlong/.vscode/extensions/ms-python.python-2025.2.0-win32-x64/schemas/condarc.json": "file:///c%3A/Users/maosanlong/OneDrive/%E6%96%87%E6%A1%A3/GitHub/HowToDeploy/awx_depoly/awx_deploy.yml"
+    }
 }
