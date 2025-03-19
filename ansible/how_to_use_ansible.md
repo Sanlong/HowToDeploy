@@ -1,6 +1,7 @@
 # Ansible 完全使用指南
 
 ## 目录
+<<<<<<< HEAD
 ### 基础篇
 1. [核心概念](#核心概念)
    - [架构组成](#架构组成)
@@ -35,6 +36,17 @@
 13. [最佳实践](#最佳实践)
 
 [▲ 返回顶部](#ansible-完全使用指南)
+=======
+1. [核心概念](#核心概念)
+2. [安装与配置](#安装与配置)
+3. [Inventory管理](#inventory管理)
+4. [Ad-hoc命令](#ad-hoc命令)
+5. [Playbook详解](#playbook详解)
+6. [常用模块手册](#常用模块手册)
+7. [高级技巧](#高级技巧)
+8. [最佳实践](#最佳实践)
+9. [模块速查表](#模块速查表)
+>>>>>>> df704e66a0f9a69bb5276afcde02f2c9c4933b5c
 
 ## 核心概念
 ### 架构组成
@@ -72,6 +84,7 @@ ansible web_servers -m shell -a "free -m"
 
 ## 常用模块手册
 ### 系统管理模块
+<<<<<<< HEAD
 #### 软件包管理
 | 参数名称 | 类型 | 说明 | 默认值 |
 |----------|------|------|--------|
@@ -82,6 +95,8 @@ ansible web_servers -m shell -a "free -m"
 | exclude | 字符串 | 排除软件包 | 无 |
 
 #### 服务管理
+=======
+>>>>>>> df704e66a0f9a69bb5276afcde02f2c9c4933b5c
 **yum模块**:
 ```yaml
 - name: 安装最新版nginx
@@ -90,6 +105,7 @@ ansible web_servers -m shell -a "free -m"
     state: latest
     update_cache: yes
 
+<<<<<<< HEAD
 # 完整参数说明
 # name: 软件包名称(支持*通配符)
 # state: 
@@ -162,6 +178,9 @@ ansible web_servers -m shell -a "free -m"
     name: kernel-4.18.0-*.el8
     state: removed
     exclude: kernel-4.18.0-348.*
+=======
+# state可选值：present/absent/latest
+>>>>>>> df704e66a0f9a69bb5276afcde02f2c9c4933b5c
 ```
 
 **service模块**:
@@ -290,6 +309,7 @@ ansible web_servers -m shell -a "free -m"
     resizefs: yes
 ```
 
+<<<<<<< HEAD
 ## 网络管理模块
 
 ### 网络设备配置
@@ -481,6 +501,9 @@ ansible web_servers -m shell -a "free -m"
             dst: 10.200.0.0/24
             port: 80
 ```
+=======
+## 网络设备配置
+>>>>>>> df704e66a0f9a69bb5276afcde02f2c9c4933b5c
 **ios_command模块**:
 ```yaml
 - name: 配置Cisco交换机
