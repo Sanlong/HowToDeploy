@@ -2,13 +2,17 @@
 
 ## 1. 环境准备
 ### 1.1 系统要求
-- 操作系统: RockyLinux 9.5服务器(主机A)
+- 操作系统: 
+  - 主机A(部署执行机): RockyLinux 9.5服务器
+  - 主机B(all-in-one节点): RockyLinux 9.5服务器
 - 硬件配置: 
-  - 主机A(控制节点): 至少4核CPU, 8GB内存, 50GB磁盘空间
-- 网络: 至少2个网络接口
-- 用户: 主机A上已创建具有sudo权限的非root用户msl
+  - 主机A: 至少2核CPU, 4GB内存, 20GB磁盘空间(仅用于部署)
+  - 主机B: 至少8核CPU, 16GB内存, 100GB磁盘空间(运行所有OpenStack服务)
+- 网络: 每台主机至少2个网络接口
+- 用户: 两台主机上已创建具有sudo权限的非root用户msl
 
-### 1.2 主机A上的依赖安装
+### 1.2 主机A上的操作
+#### 1.2.1 安装依赖
 ```bash
 # 主机A上执行
 # 安装基础依赖
@@ -19,7 +23,7 @@ sudo dnf install -y python3-devel libffi-devel gcc openssl-devel python3-pip pyt
 python3 -m virtualenv ~/kolla-venv
 source ~/kolla-venv/bin/activate
 
-# 添加当前用户到docker组并重启docker服务
+# 主机A上执行：添加当前用户到docker组并重启docker服务
 sudo usermod -aG docker $USER
 sudo systemctl restart docker
 
@@ -31,18 +35,41 @@ pip install kolla-ansible
 # 验证kolla-ansible安装路径
 find /usr -name kolla-ansible
 
-# 配置主机A到主机B的SSH免密登录
-ssh-keygen -t rsa
-ssh-copy-id msl@主机B_IP
+### 1.3 主机B上的操作
+#### 1.3.1 准备主机B
+1. 确保主机B已安装RockyLinux 9.5
+2. 创建具有sudo权限的用户msl
+3. 安装基础依赖:
+```bash
+sudo dnf install -y epel-release
+sudo dnf install -y python3-devel libffi-devel gcc openssl-devel
+```
 
-# 测试SSH连接
-ssh msl@主机B_IP
+### 1.4 主机B准备
+#### 1.4.1 在主机B上执行
+```bash
+# 安装基础依赖
+sudo dnf install -y epel-release
+sudo dnf install -y python3-devel libffi-devel gcc openssl-devel python3-pip
+
+# 安装docker
+sudo dnf config-manager --add-repo=https://mirrors.huaweicloud.com/docker-ce/linux/centos/docker-ce.repo
+sudo sed -i 's+download.docker.com+mirrors.huaweicloud.com/docker-ce+' /etc/yum.repos.d/docker-ce.repo
+sudo dnf install -y docker-ce docker-ce-cli containerd.io
+sudo systemctl enable --now docker
+
+# 创建docker用户组并添加当前用户
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
+```
 ```
 
 
 
 ## 2. Kolla-Ansible安装
-### 2.1 在虚拟环境中安装Kolla-Ansible
+### 2.1 主机A上的操作
+#### 2.1.1 在虚拟环境中安装Kolla-Ansible
 ```bash
 # 确保在msl用户的虚拟环境中操作
 source ~/kolla-venv/bin/activate
@@ -61,7 +88,8 @@ sudo cp /usr/share/kolla-ansible/ansible/inventory/* /etc/kolla-ansible/
 ```
 
 ## 3. OpenStack部署
-### 3.1 配置globals.yml
+### 3.1 主机A上的操作
+#### 3.1.1 配置globals.yml
 编辑`/etc/kolla/globals.yml`:
 ```yaml
 kolla_base_distro: "centos"
