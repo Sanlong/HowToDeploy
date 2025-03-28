@@ -2,6 +2,7 @@
 
 ## 1. 环境准备
 ### 1.1 系统要求
+<<<<<<< HEAD
 - 操作系统: 
   - 主机A(部署执行机): RockyLinux 9.5服务器
   - 主机B(all-in-one节点): RockyLinux 9.5服务器
@@ -13,6 +14,15 @@
 
 ### 1.2 主机A上的操作
 #### 1.2.1 安装依赖
+=======
+- 操作系统: RockyLinux 9.5服务器(主机A)
+- 硬件配置: 
+  - 主机A(控制节点): 至少4核CPU, 8GB内存, 50GB磁盘空间
+- 网络: 至少2个网络接口
+- 用户: 主机A上已创建具有sudo权限的非root用户msl
+
+### 1.2 主机A上的依赖安装
+>>>>>>> 913ae837d34b62fb353afba2f72528a0f18fe196
 ```bash
 # 主机A上执行
 # 安装基础依赖
@@ -23,7 +33,11 @@ sudo dnf install -y python3-devel libffi-devel gcc openssl-devel python3-pip pyt
 python3 -m virtualenv ~/kolla-venv
 source ~/kolla-venv/bin/activate
 
+<<<<<<< HEAD
 # 主机A上执行：添加当前用户到docker组并重启docker服务
+=======
+# 添加当前用户到docker组并重启docker服务
+>>>>>>> 913ae837d34b62fb353afba2f72528a0f18fe196
 sudo usermod -aG docker $USER
 sudo systemctl restart docker
 
@@ -35,6 +49,7 @@ pip install kolla-ansible
 # 验证kolla-ansible安装路径
 find /usr -name kolla-ansible
 
+<<<<<<< HEAD
 ### 1.3 主机B上的操作
 #### 1.3.1 准备主机B
 1. 确保主机B已安装RockyLinux 9.5
@@ -63,13 +78,25 @@ sudo groupadd docker
 sudo usermod -aG docker $USER
 newgrp docker
 ```
+=======
+# 配置主机A到主机B的SSH免密登录
+ssh-keygen -t rsa
+ssh-copy-id msl@主机B_IP
+
+# 测试SSH连接
+ssh msl@主机B_IP
+>>>>>>> 913ae837d34b62fb353afba2f72528a0f18fe196
 ```
 
 
 
 ## 2. Kolla-Ansible安装
+<<<<<<< HEAD
 ### 2.1 主机A上的操作
 #### 2.1.1 在虚拟环境中安装Kolla-Ansible
+=======
+### 2.1 在虚拟环境中安装Kolla-Ansible
+>>>>>>> 913ae837d34b62fb353afba2f72528a0f18fe196
 ```bash
 # 确保在msl用户的虚拟环境中操作
 source ~/kolla-venv/bin/activate
@@ -88,8 +115,12 @@ sudo cp /usr/share/kolla-ansible/ansible/inventory/* /etc/kolla-ansible/
 ```
 
 ## 3. OpenStack部署
+<<<<<<< HEAD
 ### 3.1 主机A上的操作
 #### 3.1.1 配置globals.yml
+=======
+### 3.1 配置globals.yml
+>>>>>>> 913ae837d34b62fb353afba2f72528a0f18fe196
 编辑`/etc/kolla/globals.yml`:
 ```yaml
 kolla_base_distro: "centos"
