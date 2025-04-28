@@ -1,10 +1,9 @@
 # uselinux
 
-
-
 ## 项目结构
 
 ```
+
 HowToDeploy/
 ├── Ansible/            # Ansible自动化部署
 ├── Calico/            # 网络策略管理
