@@ -3,9 +3,11 @@
 ## 1. BIND简介
 
 ### 1.1 什么是BIND
+
 BIND（Berkeley Internet Name Domain）是目前互联网上最广泛使用的DNS服务器软件。它由美国加州大学伯克利分校最初开发，现在由互联网系统联盟（Internet Systems Consortium，ISC）维护。BIND是一个开源软件，实现了DNS协议，并提供了一个完整的、稳定的平台用于发布DNS信息和解析DNS查询。
 
 ### 1.2 主要特性
+
 - **完整的DNS标准实现**：支持所有DNS记录类型和最新的DNS标准
 - **高度可扩展**：可处理从小型到大型网络的DNS需求
 - **多平台支持**：可在多种操作系统上运行
@@ -15,6 +17,7 @@ BIND（Berkeley Internet Name Domain）是目前互联网上最广泛使用的DN
 - **丰富的部署选项**：可作为主服务器、从服务器或缓存服务器
 
 ### 1.3 应用场景
+
 1. **企业内网DNS**
    - 内部域名解析
    - 反向DNS查找
@@ -32,6 +35,7 @@ BIND（Berkeley Internet Name Domain）是目前互联网上最广泛使用的DN
 ## 2. 安装部署
 
 ### 2.1 系统要求
+
 - 支持的操作系统：Linux、Unix、Windows
 - 最小硬件要求：
   - CPU：1核心
@@ -45,6 +49,7 @@ BIND（Berkeley Internet Name Domain）是目前互联网上最广泛使用的DN
 ### 2.2 安装步骤
 
 #### 在CentOS/RHEL系统上安装
+
 ```bash
 # 安装BIND包
 sudo dnf install bind bind-utils
@@ -60,6 +65,7 @@ sudo systemctl status named
 ```
 
 #### 在Ubuntu/Debian系统上安装
+
 ```bash
 # 更新包列表
 sudo apt update
@@ -78,6 +84,7 @@ sudo systemctl status bind9
 ```
 
 ### 2.3 配置文件目录结构
+
 ```
 /etc/named.conf          # 主配置文件（RHEL/CentOS）
 /etc/bind/named.conf     # 主配置文件（Ubuntu/Debian）
@@ -92,6 +99,7 @@ sudo systemctl status bind9
 ## 3. 基础配置
 
 ### 3.1 主配置文件详解
+
 BIND的主配置文件通常是`named.conf`，它包含了服务器的基本配置和区域定义。
 
 ```nginx
@@ -120,6 +128,7 @@ logging {
 ```
 
 ### 3.2 基本配置选项说明
+
 - **directory**：指定区域文件的存放目录
 - **recursion**：是否允许递归查询
 - **allow-recursion**：允许进行递归查询的客户端列表
@@ -131,6 +140,7 @@ logging {
 ## 4. 区域配置
 
 ### 4.1 区域类型说明
+
 1. **主区域（master）**：权威区域的主要来源
 2. **从区域（slave）**：从主服务器复制的区域副本
 3. **存根区域（stub）**：仅包含NS记录的区域
@@ -140,6 +150,7 @@ logging {
 ### 4.2 区域文件配置示例
 
 #### 正向区域文件配置
+
 ```nginx
 zone "example.com" IN {
     type master;
@@ -150,6 +161,7 @@ zone "example.com" IN {
 ```
 
 #### 区域文件内容（example.com.zone）
+
 ```
 $TTL 86400
 @       IN      SOA     ns1.example.com. admin.example.com. (
@@ -169,6 +181,7 @@ mail    IN      A       192.168.1.200
 ```
 
 #### 反向区域文件配置
+
 ```nginx
 zone "1.168.192.in-addr.arpa" IN {
     type master;
@@ -179,6 +192,7 @@ zone "1.168.192.in-addr.arpa" IN {
 ```
 
 ### 4.3 资源记录类型
+
 - **A**：IPv4地址记录
 - **AAAA**：IPv6地址记录
 - **CNAME**：别名记录
@@ -192,6 +206,7 @@ zone "1.168.192.in-addr.arpa" IN {
 ## 5. 安全配置
 
 ### 5.1 访问控制
+
 ```nginx
 // 定义ACL
 acl internal {
@@ -208,6 +223,7 @@ options {
 ```
 
 ### 5.2 DNSSEC配置
+
 ```bash
 # 生成区域签名密钥
 dnssec-keygen -a NSEC3RSASHA1 -b 2048 -n ZONE example.com
@@ -219,6 +235,7 @@ dnssec-signzone -A -3 $(head -c 1000 /dev/random | sha1sum | cut -b 1-16) \
 ```
 
 ### 5.3 日志配置
+
 ```nginx
 logging {
     channel security_log {
@@ -236,6 +253,7 @@ logging {
 ## 6. 实践示例
 
 ### 6.1 主DNS服务器配置
+
 ```nginx
 // named.conf
 options {
@@ -264,6 +282,7 @@ zone "example.com" IN {
 ```
 
 ### 6.2 从DNS服务器配置
+
 ```nginx
 // named.conf
 options {
@@ -281,6 +300,7 @@ zone "example.com" IN {
 ```
 
 ### 6.3 缓存DNS服务器配置
+
 ```nginx
 options {
     directory "/var/named";
@@ -297,6 +317,7 @@ options {
 ## 7. 维护管理
 
 ### 7.1 测试验证
+
 ```bash
 # 检查配置文件语法
 named-checkconf /etc/named.conf
@@ -312,6 +333,7 @@ dig @localhost -x 192.168.1.100
 ```
 
 ### 7.2 常见问题诊断
+
 1. **服务无法启动**
    - 检查错误日志：`journalctl -u named`
    - 验证配置文件语法
@@ -328,7 +350,9 @@ dig @localhost -x 192.168.1.100
    - 查看错误日志
 
 ### 7.3 性能优化
+
 1. **内存优化**
+
 ```nginx
 options {
     recursive-clients 1000;
@@ -338,6 +362,7 @@ options {
 ```
 
 2. **查询优化**
+
 ```nginx
 options {
     minimal-responses yes;
@@ -348,6 +373,7 @@ options {
 ```
 
 ### 7.4 监控建议
+
 - 使用BIND统计通道监控服务状态
 - 配置详细的日志记录
 - 设置资源使用告警
